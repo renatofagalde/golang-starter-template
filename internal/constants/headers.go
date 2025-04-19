@@ -1,11 +1,13 @@
 package constants
 
 type Headers struct {
-	TraceID string `form:"trace_id" binding:"required"`
+	Stage   string `json:"stage"`
 	Journey string `form:"journey" binding:"required"`
+	TraceID string `form:"trace_id" binding:"required"`
 }
 
 var H = Headers{
-	TraceID: "X-Request-ID",
+	Stage:   "Stage",
 	Journey: "X-Request-Journey",
+	TraceID: "X-Request-ID",
 }
