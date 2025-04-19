@@ -16,6 +16,7 @@ type noteController struct {
 	notesUseCase input.NotesUseCase
 }
 
+//goland:noinspection GoExportedFuncWithUnexportedType
 func NewNoteController(notesUseCase input.NotesUseCase) *noteController {
 	return &noteController{notesUseCase}
 }
