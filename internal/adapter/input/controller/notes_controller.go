@@ -11,6 +11,7 @@ import (
 
 type noteController struct{}
 
+//goland:noinspection GoExportedFuncWithUnexportedType
 func NewNoteController() *noteController {
 	return &noteController{}
 }
