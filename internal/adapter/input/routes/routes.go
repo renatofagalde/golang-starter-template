@@ -6,7 +6,7 @@ import (
 )
 
 func InitRoutes(r *gin.Engine) {
-	noteController := controller.NewNoteController()
 
+	var noteController = controller.NewNoteController()
 	r.GET("/notes", noteController.ListNotes)
 }
