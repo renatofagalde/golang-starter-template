@@ -30,7 +30,7 @@ func (nc *noteClient) GetNotesPort(noteDomainRequest domain_request.NoteRequest)
 	_, err := client.R().
 		SetQueryParams(map[string]string{
 			"q":      noteDomainRequest.Subject,
-			"from":   noteDomainRequest.From.Format("2006-01-02"),
+			"from":   noteDomainRequest.From.Format("2006-01-20"),
 			"apikey": env.GetNewsTokenAPI(),
 		}).SetResult(noteModelResponse).Get("/everything")
 	if err != nil {
