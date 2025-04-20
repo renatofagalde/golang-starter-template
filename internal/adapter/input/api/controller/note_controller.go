@@ -1,12 +1,14 @@
 package controller
 
 import (
+	model_response "bootstrap/internal/adapter/input/model/reponse"
 	"bootstrap/internal/adapter/input/model/request"
 	domain_request "bootstrap/internal/application/domain/request"
 	"bootstrap/internal/application/port/input"
 	"bootstrap/internal/config/logger"
 	"bootstrap/internal/config/validation"
 	"bootstrap/internal/constants"
+	"github.com/jinzhu/copier"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -29,7 +31,7 @@ func (nc *noteController) ListNotes(ctx *gin.Context) {
 		zap.String(constants.H.Journey, ctx.GetHeader(constants.H.Journey)),
 		zap.String(constants.H.TraceID, ctx.GetHeader(constants.H.TraceID)))
 
-	var noteRequest = &request.NoteRequest{}
+	var noteRequest = &model_request.NoteModelRequest{}
 
 	if err := ctx.ShouldBindQuery(noteRequest); err != nil {
 		logger.Error("Error trying to validate fields from request", err)
@@ -47,5 +49,8 @@ func (nc *noteController) ListNotes(ctx *gin.Context) {
 	if err != nil {
 		ctx.JSON(err.Code, err)
 	}
-	ctx.JSON(http.StatusOK, notes)
+
+	notes_model_response := model_response.NoteResponseModel{}
+	copier.Copy(&notes_model_response, notes)
+	ctx.JSON(http.StatusOK, notes_model_response)
 }

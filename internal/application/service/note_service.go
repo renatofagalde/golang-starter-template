@@ -26,8 +26,8 @@ func (ns *noteService) ListNotesService(ctx context.Context, noteDomainRequest d
 	logger.Info(fmt.Sprintf("ListNotesService, subject=%s, from=%s, to=%s",
 		noteDomainRequest.Subject, noteDomainRequest.From),
 		zap.String(constants.H.Stage, "service"),
-		zap.String(constants.H.Journey, ctx.Value(constants.H.Journey).(string)),
-		zap.String(constants.H.TraceID, ctx.Value(constants.H.TraceID).(string)))
+		zap.String(constants.H.Journey, constants.H.GetJourney(ctx)),
+		zap.String(constants.H.TraceID, constants.H.GetTraceID(ctx)))
 
 	noteDomainResponse, err := ns.notePort.GetNotesPort(noteDomainRequest)
 	return noteDomainResponse, err
