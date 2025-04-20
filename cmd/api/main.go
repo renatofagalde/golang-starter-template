@@ -3,13 +3,10 @@ package main
 import (
 	"bootstrap/internal/adapter/input/routes"
 	"bootstrap/internal/config/logger"
-	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	fmt.Println("Hello World")
-
 	gin.SetMode(gin.DebugMode)
 	router := gin.Default()
 	routes.InitRoutes(router)
