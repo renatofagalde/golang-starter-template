@@ -3,5 +3,5 @@ package env
 import "os"
 
 func GetNewsTokenAPI() string {
-	return os.Getenv("NEW_API_KEY")
+	return os.Getenv("NEWS_API_KEY")
 }
