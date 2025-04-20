@@ -7,11 +7,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func InitRoutes(r *gin.Engine) {
+func InitRoutes(r *gin.RouterGroup) {
 
 	noteClient := note_http.NewNoteClient()
 
 	noteService := service.NewNoteService(noteClient)
 	var noteController = controller.NewNoteController(noteService)
-	r.GET("/notes", noteController.ListNotes)
+
+	apiGroup := r.Group("/api")
+	apiGroup.GET("/notes", noteController.ListNotes)
 }
