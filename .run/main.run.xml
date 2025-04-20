@@ -1,0 +1,19 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="main" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <module name="golang-starter-template" />
+    <working_directory value="$PROJECT_DIR$" />
+    <envs>
+      <env name="NEWS_API_KEY" value="13da330cf09942c9b416deb76cd91c7c" />
+    </envs>
+    <EXTENSION ID="software.aws.toolkits.jetbrains.core.execution.GoAwsConnectionRunConfigurationExtension">
+      <option name="credential" />
+      <option name="region" />
+      <option name="useCurrentConnection" value="false" />
+    </EXTENSION>
+    <kind value="PACKAGE" />
+    <package value="bootstrap/cmd/api" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$/cmd/api/main.go" />
+    <method v="2" />
+  </configuration>
+</component>
