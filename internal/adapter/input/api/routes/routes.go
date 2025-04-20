@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"bootstrap/internal/adapter/input/controller"
+	"bootstrap/internal/adapter/input/api/controller"
 	"bootstrap/internal/adapter/output/note_http"
 	"bootstrap/internal/application/service"
 	"github.com/gin-gonic/gin"

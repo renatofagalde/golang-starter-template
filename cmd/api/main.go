@@ -1,13 +1,13 @@
 package main
 
 import (
-	"bootstrap/internal/adapter/input/routes"
+	"bootstrap/internal/adapter/input/api/routes"
 	"bootstrap/internal/config/logger"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	gin.SetMode(gin.DebugMode)
+	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 	routes.InitRoutes(router)
 	if err := router.Run(":8080"); err != nil {

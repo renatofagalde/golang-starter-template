@@ -7,6 +7,7 @@ import (
 	"bootstrap/internal/config/logger"
 	"bootstrap/internal/config/validation"
 	"bootstrap/internal/constants"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -32,7 +33,7 @@ func (nc *noteController) ListNotes(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindQuery(noteRequest); err != nil {
 		logger.Error("Error trying to validate fields from request", err)
-		errRest := validation.ValidateUserError(err)
+		errRest := validation.ValidateError(err)
 		ctx.JSON(errRest.Code, errRest)
 		return
 	}
@@ -42,5 +43,9 @@ func (nc *noteController) ListNotes(ctx *gin.Context) {
 		From:    noteRequest.From,
 	}
 
-	_, _ = nc.notesUseCase.ListNotesService(ctx.Request.Context(), noteRequestDomain)
+	notes, err := nc.notesUseCase.ListNotesService(ctx.Request.Context(), noteRequestDomain)
+	if err != nil {
+		ctx.JSON(err.Code, err)
+	}
+	ctx.JSON(http.StatusOK, notes)
 }
