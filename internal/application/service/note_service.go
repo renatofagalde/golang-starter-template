@@ -1,9 +1,9 @@
 package service
 
 import (
+	"bootstrap/internal/adapter/output/factory"
 	domain_request "bootstrap/internal/application/domain/request"
 	domain_response "bootstrap/internal/application/domain/response"
-	"bootstrap/internal/application/port/output"
 	"bootstrap/internal/config/logger"
 	"bootstrap/internal/config/rest_err"
 	"bootstrap/internal/constants"
@@ -13,12 +13,12 @@ import (
 )
 
 type noteService struct {
-	notePort output.NotePort
+	noteFactory *factory.NoteFactory
 }
 
 //goland:noinspection GoExportedFuncWithUnexportedType
-func NewNoteService(notePort output.NotePort) *noteService {
-	return &noteService{notePort: notePort}
+func NewNoteService(noteFactory *factory.NoteFactory) *noteService {
+	return &noteService{noteFactory: noteFactory}
 }
 
 func (ns *noteService) ListNotesService(ctx context.Context, noteDomainRequest domain_request.NoteRequest) (*domain_response.NoteResponseDomain, *rest_err.RestErr) {
@@ -29,6 +29,9 @@ func (ns *noteService) ListNotesService(ctx context.Context, noteDomainRequest d
 		zap.String(constants.H.Journey, constants.H.GetJourney(ctx)),
 		zap.String(constants.H.TraceID, constants.H.GetTraceID(ctx)))
 
-	noteDomainResponse, err := ns.notePort.GetNotesPort(noteDomainRequest)
+	noteFactory := ns.noteFactory.GetNotePort(noteDomainRequest.Action)
+
+	noteDomainResponse, err := noteFactory.GetNotesPort(ctx, noteDomainRequest)
 	return noteDomainResponse, err
+
 }
