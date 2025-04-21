@@ -3,7 +3,12 @@
     <module name="golang-starter-template" />
     <working_directory value="$PROJECT_DIR$" />
     <envs>
+      <env name="ACCESS_TOKEN_DURATION" value="15m" />
+      <env name="DB_DRIVER" value="postgres" />
+      <env name="DB_SOURCE" value="postgresql://user:pass@localhost:5433/postgres" />
       <env name="NEWS_API_KEY" value="13da330cf09942c9b416deb76cd91c7c" />
+      <env name="SERVER_ADDRESS" value="0.0.0.0:8080" />
+      <env name="TOKEN_SYMMETRIC_KEY" value="TESTE_TOKEN" />
     </envs>
     <EXTENSION ID="software.aws.toolkits.jetbrains.core.execution.GoAwsConnectionRunConfigurationExtension">
       <option name="credential" />
