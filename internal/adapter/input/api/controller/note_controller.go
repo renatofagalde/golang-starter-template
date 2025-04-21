@@ -1,8 +1,8 @@
 package controller
 
 import (
-	model_response "bootstrap/internal/adapter/input/model/reponse"
 	"bootstrap/internal/adapter/input/model/request"
+	model_response "bootstrap/internal/adapter/input/model/response"
 	domain_request "bootstrap/internal/application/domain/request"
 	"bootstrap/internal/application/port/input"
 	"bootstrap/internal/config/logger"
@@ -43,6 +43,7 @@ func (nc *noteController) ListNotes(ctx *gin.Context) {
 	noteRequestDomain := domain_request.NoteRequest{
 		Subject: noteRequest.Subject,
 		From:    noteRequest.From,
+		Action:  noteRequest.Action,
 	}
 
 	notes, err := nc.notesUseCase.ListNotesService(ctx.Request.Context(), noteRequestDomain)

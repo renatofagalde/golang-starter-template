@@ -5,4 +5,5 @@ import "time"
 type NoteRequest struct {
 	Subject string
 	From    time.Time
+	Action  string
 }
