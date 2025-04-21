@@ -8,5 +8,5 @@ import (
 )
 
 type NotePort interface {
-	GetNotesPort(ctx context.Context, domain_request.NoteRequest) (*domain_response.NoteResponseDomain, *rest_err.RestErr)
+	GetNotesPort(context.Context, domain_request.NoteRequest) (*domain_response.NoteResponseDomain, *rest_err.RestErr)
 }

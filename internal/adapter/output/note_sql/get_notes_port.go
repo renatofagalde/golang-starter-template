@@ -20,36 +20,21 @@ func (nr *noteRepository) GetNotesPort(ctx context.Context, noteRequest domain_r
 		zap.String(constants.H.Journey, constants.H.GetJourney(ctx)),
 		zap.String(constants.H.TraceID, constants.H.GetTraceID(ctx)))
 
-	var noteEntities []entity.NoteEntity
-	query := nr.database.Model(&entity.NoteEntity{})
-
-	if err := query.First(&noteEntities).Error; err != nil {
-		logger.Error("Error getting notes from database", err,
-			zap.String(constants.H.Stage, "repository"),
-			zap.String(constants.H.Journey, constants.H.GetJourney(nil)),
-			zap.String(constants.H.TraceID, constants.H.GetTraceID(nil)))
-		return nil, rest_err.NewInternalServerError("Error getting notes from database")
+	var articles []entity.Article = make([]entity.Article, 0)
+	result := nr.database.WithContext(ctx).
+		Table("note.article").
+		Find(&articles)
+	if result.Error != nil {
+		return nil, rest_err.NewInternalServerError(result.Error.Error())
 	}
 
-	noteDomain := domain_response.ArticleResponseDomain{
-		Author:      noteEntities[0].Author,
-		Title:       noteEntities[0].Title,
-		Description: noteEntities[0].Description,
-		URL:         noteEntities[0].URL,
-		URLToImage:  noteEntities[0].URLToImage,
-		PublishedAt: noteEntities[0].PublishedAt,
-		Content:     noteEntities[0].Content,
+	articleResponseDomain := []domain_response.ArticleResponseDomain{}
+	copier.Copy(&articleResponseDomain, &articles)
+	notesDomain := domain_response.NoteResponseDomain{
+		Status:       "ok",
+		TotalResults: len(articleResponseDomain),
+		Articles:     articleResponseDomain,
 	}
 
-	//var n [1]domain_response.ArticleSourceResponseDomain = [1]domain_response.ArticleSourceResponseDomain
-	//n[0] = noteDomain
-	//domain_response.NoteResponseDomain{
-	//	Status:       "ok",
-	//	TotalResults: 0,
-	//	Articles:     n,
-	//}
-
-	copier.Copy(&noteDomain, &noteEntities)
-
-	return &noteDomain, nil
+	return &notesDomain, nil
 }
