@@ -1,23 +1,23 @@
 package model_response
 
 type NoteResponseModel struct {
-	Status       string                 `json:"status"`
-	TotalResults int                    `json:"total_results"`
-	Articles     []ArticleModelResponse `json:"articles"`
+	Status       string                 `json:"status,omitempty"`
+	TotalResults int                    `json:"total_results,omitempty"`
+	Articles     []ArticleModelResponse `json:"articles,omitempty"`
 }
 
 type ArticleModelResponse struct {
-	Source      ArticleSourceModelResponse `json:"source"`
-	Author      string                     `json:"author"`
-	Title       string                     `json:"title"`
-	Description string                     `json:"description"`
-	URL         string                     `json:"url"`
-	URLToImage  string                     `json:"url_to_image"`
-	PublishedAt string                     `json:"published_at"`
-	Content     string                     `json:"content"`
+	Source      ArticleSourceModelResponse `json:"source,omitempty"`
+	Author      string                     `json:"author,omitempty"`
+	Title       string                     `json:"title,omitempty"`
+	Description string                     `json:"description,omitempty"`
+	URL         string                     `json:"url,omitempty"`
+	URLToImage  string                     `json:"url_to_image,omitempty"`
+	PublishedAt string                     `json:"published_at,omitempty"`
+	Content     string                     `json:"content,omitempty"`
 }
 
 type ArticleSourceModelResponse struct {
-	ID   *string `json:"id"`
-	Name string  `json:"name"`
+	ID   *string `json:"id,omitempty"`
+	Name string  `json:"name,omitempty"`
 }
