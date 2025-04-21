@@ -1,0 +1,161 @@
+name: Go Application CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - 'feature/**'
+      - 'develop'
+      - 'main'
+  pull_request:
+    branches:
+      - 'develop'
+      - 'main'
+
+env:
+  PIPELINE_USER_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  PIPELINE_USER_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  SAM_TEMPLATE: deployments/lambda/template.yaml
+  DEVELOP_STACK_NAME: app-cam-develop
+  DEVELOP_PIPELINE_EXECUTION_ROLE: ${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE }}
+  DEVELOP_CLOUDFORMATION_EXECUTION_ROLE: ${{ secrets.TESTING_CLOUDFORMATION_EXECUTION_ROLE }}
+  DEVELOP_ARTIFACTS_BUCKET: ${{ secrets.TESTING_ARTIFACTS_BUCKET }}
+  DEVELOP_REGION: us-east-1
+  PROD_STACK_NAME: app-cam
+  PROD_PIPELINE_EXECUTION_ROLE: ${{ secrets.PROD_PIPELINE_EXECUTION_ROLE }}
+  PROD_CLOUDFORMATION_EXECUTION_ROLE: ${{ secrets.PROD_CLOUDFORMATION_EXECUTION_ROLE }}
+  PROD_ARTIFACTS_BUCKET: ${{ secrets.PROD_ARTIFACTS_BUCKET }}
+  PROD_REGION: us-east-1
+  GO_VERSION: '1.24.2'
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Run tests
+        run: go test -v ./...
+
+  # This job will block PRs to develop if tests fail
+  validate-pr:
+    name: Validate PR
+    needs: test
+    if: github.event_name == 'pull_request' && github.base_ref == 'develop'
+    runs-on: ubuntu-latest
+    steps:
+      - name: PR can be merged
+        run: echo "Tests passed, PR can be merged"
+
+  build-and-deploy-to-develop:
+    name: Build and Deploy to Development
+    needs: test
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Build Lambda binary
+        run: |
+          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -tags lambda.norpc -o bootstrap ./cmd/api
+          zip -j deployment.zip bootstrap
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ env.PIPELINE_USER_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.DEVELOP_REGION }}
+
+      - name: Upload artifact to S3
+        run: |
+          aws s3 cp deployment.zip s3://${{ env.DEVELOP_ARTIFACTS_BUCKET }}/app-cam-develop/deployment.zip
+
+      - name: Update SAM template for deployment
+        run: |
+          # Create a temp directory for processed template
+          mkdir -p .aws-sam/build
+          
+          # Process template and replace placeholders
+          cp ${{ env.SAM_TEMPLATE }} .aws-sam/build/template.yaml
+          sed -i 's/YOUR_DEPLOYMENT_BUCKET_NAME/${{ env.DEVELOP_ARTIFACTS_BUCKET }}/g' .aws-sam/build/template.yaml
+          sed -i 's/YOUR_ZIP_FILE_PATH/app-cam-develop\/deployment.zip/g' .aws-sam/build/template.yaml
+
+      - name: Deploy with SAM
+        run: |
+          sam deploy \
+            --template-file .aws-sam/build/template.yaml \
+            --stack-name ${{ env.DEVELOP_STACK_NAME }} \
+            --region ${{ env.DEVELOP_REGION }} \
+            --capabilities CAPABILITY_IAM \
+            --role-arn ${{ env.DEVELOP_CLOUDFORMATION_EXECUTION_ROLE }} \
+            --no-fail-on-empty-changeset
+
+  build-and-deploy-to-production:
+    name: Build and Deploy to Production
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Build Lambda binary
+        run: |
+          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -tags lambda.norpc -o bootstrap ./cmd/api
+          zip -j deployment.zip bootstrap
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ env.PIPELINE_USER_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.PROD_REGION }}
+
+      - name: Upload artifact to S3
+        run: |
+          aws s3 cp deployment.zip s3://${{ env.PROD_ARTIFACTS_BUCKET }}/app-cam-prod/deployment.zip
+
+      - name: Update SAM template for deployment
+        run: |
+          # Create a temp directory for processed template
+          mkdir -p .aws-sam/build
+          
+          # Process template and replace placeholders
+          cp ${{ env.SAM_TEMPLATE }} .aws-sam/build/template.yaml
+          sed -i 's/YOUR_DEPLOYMENT_BUCKET_NAME/${{ env.PROD_ARTIFACTS_BUCKET }}/g' .aws-sam/build/template.yaml
+          sed -i 's/YOUR_ZIP_FILE_PATH/app-cam-prod\/deployment.zip/g' .aws-sam/build/template.yaml
+
+      - name: Deploy with SAM
+        run: |
+          sam deploy \
+            --template-file .aws-sam/build/template.yaml \
+            --stack-name ${{ env.PROD_STACK_NAME }} \
+            --region ${{ env.PROD_REGION }} \
+            --capabilities CAPABILITY_IAM \
+            --role-arn ${{ env.PROD_CLOUDFORMATION_EXECUTION_ROLE }} \
+            --no-fail-on-empty-changeset
