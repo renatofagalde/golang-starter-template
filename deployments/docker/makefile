@@ -20,12 +20,17 @@ flyway:
 		docker compose up flyway-note; \
 	else \
 	    set -a; . ./.env.$(ENV); set +a; \
+       SQL_PATH="$$(pwd)/../sql_scripts/$(ENV)" && \
+       echo "Using SQL path: $$SQL_PATH" && \
        export FLYWAY_URL=$$FLYWAY_URL && \
        export FLYWAY_USER=$$FLYWAY_USER && \
        export FLYWAY_PASSWORD=$$FLYWAY_PASSWORD && \
-       export FLYWAY_LOCATIONS="filesystem:$(pwd)/../sql_scripts/dev" && \
+       export FLYWAY_LOCATIONS="filesystem:$$SQL_PATH" && \
        export FLYWAY_SCHEMAS=$$FLYWAY_SCHEMAS && \
        export FLYWAY_DATABASE=$$FLYWAY_DATABASE && \
+       export FLYWAY_LOCK_RETRY_COUNT=100 && \
+       export FLYWAY_MIXED=true && \
+#        flyway repair && \
        flyway -X -baselineOnMigrate=true -outOfOrder=true -validateOnMigrate=false migrate; \
     fi
 
