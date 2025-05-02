@@ -1,0 +1,12 @@
+{
+  "httpMethod": "GET",
+  "path": "/api/notes",
+  "queryStringParameters": {
+    "subject": "technology",
+    "from": "2025-01-01"
+  },
+  "headers": {
+    "X-Request-Journey": "local-test",
+    "X-Request-ID": "123456"
+  }
+}

@@ -15,12 +15,12 @@ env:
   PIPELINE_USER_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   PIPELINE_USER_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   SAM_TEMPLATE: deployments/lambda/template.yaml
-  DEVELOP_STACK_NAME: app-cam-develop
-  DEVELOP_PIPELINE_EXECUTION_ROLE: ${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE }}
-  DEVELOP_CLOUDFORMATION_EXECUTION_ROLE: ${{ secrets.TESTING_CLOUDFORMATION_EXECUTION_ROLE }}
-  DEVELOP_ARTIFACTS_BUCKET: ${{ secrets.TESTING_ARTIFACTS_BUCKET }}
+  DEVELOP_STACK_NAME: golang-starter-template
+  DEVELOP_PIPELINE_EXECUTION_ROLE: ${{ secrets.DEVELOP_PIPELINE_EXECUTION_ROLE }}
+  DEVELOP_CLOUDFORMATION_EXECUTION_ROLE: ${{ secrets.DEVELOP_CLOUDFORMATION_EXECUTION_ROLE }}
+  DEVELOP_ARTIFACTS_BUCKET: ${{ secrets.DEVELOP_ARTIFACTS_BUCKET }}
   DEVELOP_REGION: us-east-1
-  PROD_STACK_NAME: app-cam
+  PROD_STACK_NAME: golang-starter-template
   PROD_PIPELINE_EXECUTION_ROLE: ${{ secrets.PROD_PIPELINE_EXECUTION_ROLE }}
   PROD_CLOUDFORMATION_EXECUTION_ROLE: ${{ secrets.PROD_CLOUDFORMATION_EXECUTION_ROLE }}
   PROD_ARTIFACTS_BUCKET: ${{ secrets.PROD_ARTIFACTS_BUCKET }}
@@ -86,7 +86,7 @@ jobs:
 
       - name: Upload artifact to S3
         run: |
-          aws s3 cp deployment.zip s3://${{ env.DEVELOP_ARTIFACTS_BUCKET }}/app-cam-develop/deployment.zip
+          aws s3 cp deployment.zip s3://${{ env.DEVELOP_ARTIFACTS_BUCKET }}/golang-starter-template/deployment.zip
 
       - name: Update SAM template for deployment
         run: |
