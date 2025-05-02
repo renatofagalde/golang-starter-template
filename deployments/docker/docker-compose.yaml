@@ -1,5 +1,3 @@
-
-version: "3.8"
 services:
   postgres-note:
     image: postgres:latest
@@ -17,24 +15,30 @@ services:
     restart: always
     networks:
       - local-network-developer
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d note"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   flyway-note:
-      image: flyway/flyway:latest
-      container_name: flyway-note
-      depends_on:
-        - postgres-note
-      environment:
-        FLYWAY_URL: jdbc:postgresql://postgres-note:5432/note
-        FLYWAY_USER: user
-        FLYWAY_PASSWORD: pass
-        FLYWAY_LOCATIONS: filesystem:/flyway/sql/${FLYWAY_ENV}
-      env_file:
-        - ./docker.env
-      volumes:
-        - ../sql_scripts:/flyway/sql
-      networks:
-        - local-network-developer
-      command: -X -baselineOnMigrate=true migrate
+    image: flyway/flyway:latest
+    container_name: flyway-note
+    depends_on:
+      postgres-note:
+        condition: service_healthy
+    environment:
+      - FLYWAY_URL=jdbc:postgresql://postgres-note:5432/note
+      - FLYWAY_USER=user
+      - FLYWAY_PASSWORD=pass
+      - FLYWAY_LOCATIONS=filesystem:/flyway/sql/local
+      - FLYWAY_SCHEMAS=note
+      - FLYWAY_DATABASE=note
+    volumes:
+      - ../sql_scripts:/flyway/sql
+    networks:
+      - local-network-developer
+    command: -X -baselineOnMigrate=true migrate
 
   app-note:
     build:
