@@ -1,10 +1,8 @@
--- Excluindo o esquema existente e criando um novo
--- DROP SCHEMA IF EXISTS note CASCADE;
-CREATE SCHEMA IF NOT EXISTS note;
+DROP database IF EXISTS note;
+create database note;
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp"; -- uuid
 
--- Tabela de fonte de artigos
 CREATE TABLE IF NOT EXISTS "note"."article_source" (
                                                        id SERIAL PRIMARY KEY,
                                                        ide UUID DEFAULT gen_random_uuid(),
