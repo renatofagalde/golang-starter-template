@@ -55,8 +55,8 @@ Resources:
       Handler: bootstrap
       Role: !GetAtt LambdaExecutionRole.Arn
       Code:
-        S3Bucket: YOUR_DEPLOYMENT_BUCKET_NAME
-        S3Key: YOUR_ZIP_FILE_PATH
+        S3Bucket: !Sub "likwi-repository-lambdas-${Environment}"
+        S3Key: deployment.zip
       MemorySize: 128
       Timeout: 30
       Environment:
