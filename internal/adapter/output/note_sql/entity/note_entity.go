@@ -21,7 +21,7 @@ type ArticleSource struct {
 }
 
 func (ArticleSource) TableName() string {
-	return "note.article_source"
+	return "article_source"
 }
 
 type Article struct {
@@ -35,11 +35,11 @@ type Article struct {
 	PublishedAt *time.Time    `json:"published_at" gorm:"column:published_at"`
 	Content     *string       `json:"content" gorm:"type:text;column:content"`
 	Source      ArticleSource `json:"-" gorm:"foreignKey:SourceID;references:ID"`
-	Notes       []Note        `json:"notes" gorm:"many2many:note.note_article;foreignKey:ID;joinForeignKey:article_id;References:ID;joinReferences:note_id"`
+	Notes       []Note        `json:"notes" gorm:"many2many:note_article;foreignKey:ID;joinForeignKey:article_id;References:ID;joinReferences:note_id"`
 }
 
 func (Article) TableName() string {
-	return "note.article"
+	return "article"
 }
 
 type Note struct {
@@ -47,11 +47,11 @@ type Note struct {
 	Status       string    `json:"status" gorm:"not null;column:status;size:100"`
 	TotalResults int       `json:"total_results" gorm:"not null;default:0;column:total_results"`
 	QueryText    *string   `json:"query_text" gorm:"column:query_text"`
-	Articles     []Article `json:"articles" gorm:"many2many:note.note_article;foreignKey:ID;joinForeignKey:note_id;References:ID;joinReferences:article_id"`
+	Articles     []Article `json:"articles" gorm:"many2many:note_article;foreignKey:ID;joinForeignKey:note_id;References:ID;joinReferences:article_id"`
 }
 
 func (Note) TableName() string {
-	return "note.note"
+	return "note"
 }
 
 type NoteArticle struct {
@@ -62,7 +62,6 @@ type NoteArticle struct {
 	Article   Article `json:"-" gorm:"foreignKey:ArticleID;references:ID"`
 }
 
-// TableName define o nome da tabela
 func (NoteArticle) TableName() string {
-	return "note.note_article"
+	return "note_article"
 }

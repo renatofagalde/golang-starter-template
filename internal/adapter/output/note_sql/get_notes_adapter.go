@@ -22,7 +22,7 @@ func (nr *noteRepository) GetNotesPort(ctx context.Context, noteRequest domain_r
 
 	var articles []entity.Article = make([]entity.Article, 0)
 	result := nr.database.WithContext(ctx).
-		Table("note.article").
+		Table("article").
 		Find(&articles)
 	if result.Error != nil {
 		return nil, rest_err.NewInternalServerError(result.Error.Error())
