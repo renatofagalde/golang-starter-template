@@ -1,7 +1,9 @@
 -- noinspection SqlNoDataSourceInspectionForFile
 
+SET search_path TO public;
+
 -- First, insert the article sources
-INSERT INTO note.article_source (source_id, name) VALUES
+INSERT INTO article_source (source_id, name) VALUES
                                                       ('wired', 'Wired'),
                                                       ('the-verge', 'The Verge'),
                                                       (NULL, 'Gizmodo.com'),
@@ -21,11 +23,11 @@ INSERT INTO note.article_source (source_id, name) VALUES
                                                       ('hacker-news', 'Hacker News');
 
 -- Insert a note for this search query
-INSERT INTO note.note (status, total_results, query_text)
+INSERT INTO note (status, total_results, query_text)
 VALUES ('ok', 4205, 'technology news');
 
 -- Insert articles
-INSERT INTO note.article (
+INSERT INTO article (
     source_id,
     author,
     title,
@@ -121,5 +123,5 @@ INSERT INTO note.article (
  I just dropped tens of thousands of dollars worth of m… [+9325 chars]');
 
 -- Associate articles with the note
-INSERT INTO note.note_article (note_id, article_id)
-SELECT 1, id FROM note.article;
+INSERT INTO note_article (note_id, article_id)
+SELECT 1, id FROM article;
