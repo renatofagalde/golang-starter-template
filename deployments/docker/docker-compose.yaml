@@ -1,0 +1,61 @@
+services:
+  postgres-note:
+    image: postgres:latest
+    container_name: postgresql-note
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: note
+    ports:
+      - "5433:5432"
+    restart: always
+    networks:
+      - local-network-developer
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d note"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  flyway-note:
+    image: flyway/flyway:latest
+    container_name: flyway-note
+    depends_on:
+      postgres-note:
+        condition: service_healthy
+    environment:
+      - FLYWAY_URL=jdbc:postgresql://postgres-note:5432/note
+      - FLYWAY_USER=user
+      - FLYWAY_PASSWORD=pass
+      - FLYWAY_LOCATIONS=filesystem:/flyway/sql/local
+      - FLYWAY_SCHEMAS=public
+      - FLYWAY_DATABASE=note
+      - FLYWAY_MIXED=true
+    volumes:
+      - ../sql_scripts:/flyway/sql
+    networks:
+      - local-network-developer
+    command: -X -baselineOnMigrate=true migrate
+
+  app-note:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: debug
+      args:
+        APP_VERSION: "renatofagalde/app-note"
+    image: note-app:latest
+    container_name: app-note
+    ports:
+      - "8080:8080"
+      - "2345:2345"
+    networks:
+      - local-network-developer
+    security_opt:
+      - "seccomp:unconfined"
+    depends_on:
+      - flyway-note
+
+networks:
+  local-network-developer:
+    driver: bridge
