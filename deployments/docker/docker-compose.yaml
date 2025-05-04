@@ -8,10 +8,6 @@ services:
       POSTGRES_DB: note
     ports:
       - "5433:5432"
-#    volumes:
-#      - pg_data:/var/lib/postgresql/data
-    tmpfs:
-      - /var/lib/postgresql/data:rw,noexec,nosuid,size=64m
     restart: always
     networks:
       - local-network-developer
@@ -32,8 +28,9 @@ services:
       - FLYWAY_USER=user
       - FLYWAY_PASSWORD=pass
       - FLYWAY_LOCATIONS=filesystem:/flyway/sql/local
-      - FLYWAY_SCHEMAS=note
+      - FLYWAY_SCHEMAS=public
       - FLYWAY_DATABASE=note
+      - FLYWAY_MIXED=true
     volumes:
       - ../sql_scripts:/flyway/sql
     networks:
@@ -59,14 +56,6 @@ services:
     depends_on:
       - flyway-note
 
-
-
-volumes:
-  pg_data:
-    driver: local
-    driver_opts:
-      type: tmpfs
-      device: tmpfs
-
 networks:
   local-network-developer:
+    driver: bridge
