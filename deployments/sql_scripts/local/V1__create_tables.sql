@@ -1,8 +1,5 @@
 SET search_path TO public;
 
--- Create extension for UUID support
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
 -- Article source table
 CREATE TABLE IF NOT EXISTS article_source (
                                               id SERIAL PRIMARY KEY,

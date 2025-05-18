@@ -1,7 +1,6 @@
 -- noinspection SqlNoDataSourceInspectionForFile
 
 SET search_path TO public;
-
 -- First, insert the article sources
 INSERT INTO article_source (source_id, name) VALUES
                                                       ('wired', 'Wired'),
